@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>three.js webgl - geometry - cube</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+        <link type="text/css" rel="stylesheet" href="main.css">
+    </head>
+    <body>
+
+        <script type="module">
+
+            import * as THREE from '../build/three.module.js';
+
+            var camera, scene, renderer;
+            var mesh;
+
+            var radius=2000;
+            var num=15;
+
+            var Xaxis=[0,-200/2, 200/2];
+            var Yaxis=[0,50];
+
+            var obstacles=[];
+            var ObSpeed=5;
+
+            let controls = {};
+
+        let player = {
+            height: 25,
+            jumpHeight: 4,
+            gravity: .2,
+            velocity: 0,
+
+            playerJumps: false
+           };
+
+      document.addEventListener('keydown', ({ keyCode }) => { controls[keyCode] = true });
+      document.addEventListener('keyup', ({ keyCode }) => { controls[keyCode] = false });            
+            init();
+
+            animate();
+                
+                camera.position.set(0, player.height, 5);
+                camera.lookAt(new THREE.Vector3(0, player.height, 0));
+
+
+            function init() {
+
+
+                camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 1000 );
+                /*camera.position.z = 400;
+                camera.position.y = 35;*/
+
+                scene = new THREE.Scene();
+
+                const texture = new THREE.TextureLoader().load( 'textures/crate.gif' );
+
+                const geometry = new THREE.BoxGeometry( 20, 20, 20 );
+                const material = new THREE.MeshBasicMaterial( { map: texture } );
+
+                
+
+                for(var i =0;i<num;i++) {
+                mesh = new THREE.Mesh( geometry, material );
+                scene.add( mesh );
+                mesh.position.set(Xaxis[Math.floor(Math.random()*3)],Yaxis[Math.floor(Math.random()*2)],radius/2-radius*Math.random())
+
+                obstacles.push(mesh);
+                }
+                var meshFloor = new THREE.Mesh(
+                new THREE.PlaneGeometry(1000,1000,1000,1000),
+                new THREE.MeshBasicMaterial({color:0xffffff, wireframe:false})
+                );
+                meshFloor.rotation.x -= Math.PI / 2; // Rotate the floor 90 degrees
+
+                 meshFloor.position.y -= 15; 
+                scene.add(meshFloor);
+                renderer = new THREE.WebGLRenderer( { antialias: true } );
+                renderer.setPixelRatio( window.devicePixelRatio );
+                renderer.setSize( window.innerWidth, window.innerHeight );
+                document.body.appendChild( renderer.domElement );
+
+
+                //
+
+                window.addEventListener( 'resize', onWindowResize );
+               window.addEventListener('keydown', moveRobot, false);
+            }
+           
+            
+
+            function onWindowResize() {
+
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+
+                renderer.setSize( window.innerWidth, window.innerHeight );
+
+            }
+           
+            function animate() {
+
+                requestAnimationFrame( animate );
+                control();
+                ixMovementUpdate();
+
+                for( var i = 0; i<obstacles.length;i++){
+                    if(obstacles[i].position.z>400){
+                        obstacles[i].position.z=-350;
+                    }else{
+                    obstacles[i].position.z += ObSpeed;
+                    }
+                }
+
+
+                renderer.render( scene, camera );
+
+            }
+
+          
+            function control(){
+
+              if(controls[32]) { // space
+            
+              if(player.jumps) 
+
+                return false;
+
+              player.jumps = true;
+              player.velocity =- player.jumpHeight;
+            }
+          }
+
+
+    function ixMovementUpdate() { //jump and hit floor
+    
+    player.velocity += player.gravity;
+    camera.position.y -= player.velocity;
+
+    if(camera.position.y < player.height) {
+
+      camera.position.y = player.height;
+      player.jumps = false;
+     }
+    }
+           
+
+             function moveRobot( evt ) {
+
+        var dir2 = new THREE.Vector3( 100, 0, 0);
+        var dir1 = new THREE.Vector3( 0, 100, 0);
+       
+        switch( evt.key ) {
+
+         
+          case 'a':
+          if(camera.position.x == -100)
+         {
+ 
+          
+         }
+         else{
+            camera.position.sub(dir2);
+           
+           }
+            break;
+
+          case 'd':
+          if(camera.position.x == 100)
+         {
+ 
+          
+         }
+          else{ 
+            camera.position.add(dir2);
+               
+               }
+                break;
+
+        }
+             
+      window.addEventListener('keydown', moveRobot, false);
+
+}
+        </script>
+
+    </body>
+</html>
