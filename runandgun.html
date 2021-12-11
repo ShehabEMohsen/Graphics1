@@ -5,17 +5,62 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
         <link type="text/css" rel="stylesheet" href="main.css">
+
+
+        <style>
+            #blocker {
+                position: absolute;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0,0,0,0.5);
+            }
+
+            #instructions {
+                width: 100%;
+                height: 100%;
+
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+
+                text-align: center;
+                font-size: 14px;
+                cursor: pointer;
+            }
+        </style>
+
     </head>
     <body>
+<div id="blocker">
+            <div id="instructions">
+                <p style="font-size:36px">
+                    RUN & GUN
+                </p>
+                <p>
+                    left: A<br/>
+                    right: D<br/>
+                    down: c<br/>
+                    Jump: SPACE<br/>
+                    aim: MOUSE
+                </p>
+            </div>
+        </div>
 
         <script type="module">
 
             import * as THREE from '../build/three.module.js';
+           
 
-            var camera, light, scene, renderer;
+            import { PointerLockControls } from './jsm/controls/PointerLockControls.js';
+
+            var  light,parameters;
+
             var mesh;
-
-            var radius=2000;
+            var camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
+            let renderer = new  THREE.WebGLRenderer();
+            let scene = new THREE.Scene();
+            var radius= 2000;
             var num=25;
 
             var Xaxis=[0,-200/2, 200/2];
@@ -35,34 +80,85 @@
                 playerJumps: false
                };
 
+               
+//habd
+            // let mouseX = 0, mouseY = 0;
+
+            // let windowHalfX = window.innerWidth / 2;
+            // let windowHalfY = window.innerHeight / 2;
+
+            // const materials = [];
+//habd
+
       document.addEventListener('keydown', ({ keyCode }) => { controls[keyCode] = true });
       document.addEventListener('keyup', ({ keyCode }) => { controls[keyCode] = false });            
+            
             init();
 
             animate();
                 
-                camera.position.set(0, player.height, 5);
-                camera.lookAt(new THREE.Vector3(0, player.height, 0));
 
 
             function init() {
 
 
-                camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 1000 );
-                /*camera.position.z = 400;
-                camera.position.y = 35;*/
-
-                scene = new THREE.Scene();
+                camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
+                camera.position.set(0, player.height, 5);
+                camera.lookAt(new THREE.Vector3(0, player.height, 0));
 
 
-                const texture = new THREE.TextureLoader().load( 'textures/crate.gif' );
-
-                const geometry = new THREE.BoxGeometry( 20, 20, 20 );
-                const material = new THREE.MeshBasicMaterial( { map: texture } );
 
                 
 
-                for(var i =0;i<num;i++) {
+                //scene = new THREE.Scene();
+                 const geometry = new THREE.BoxGeometry( 20, 20, 20 );
+               
+
+                //in the htdocs files
+                const texture = new THREE.TextureLoader().load( 'textures/crate.gif' );
+              
+
+              let mousecontrols ; 
+
+               mousecontrols = new PointerLockControls(camera,renderer.domElement);
+
+
+                const blocker = document.getElementById( 'blocker' );
+                const instructions = document.getElementById( 'instructions' );
+
+                instructions.addEventListener( 'click', function () {
+
+                    mousecontrols.lock();
+
+                },false );
+
+                mousecontrols.addEventListener( 'lock', function () {
+
+                    instructions.style.display = 'none';
+                    blocker.style.display = 'none';
+
+                } );
+
+                mousecontrols.addEventListener( 'unlock', function () {
+
+                    blocker.style.display = 'block';
+                    instructions.style.display = '';
+
+                } );
+
+                scene.add( mousecontrols.getObject() );
+
+
+                 
+                const material = new THREE.MeshBasicMaterial( { map: texture } );
+
+               //number of boxes, creating boxes and putting them in array
+
+               //Xaxis takes from random from an array
+               //Yaxis takes from random from an array
+               //Z is completely random, from negative radius /2 to radius/2
+
+                for(var i =0;i<num;i++) {//number of boxes
                 mesh = new THREE.Mesh( geometry, material );
                 scene.add( mesh );
                 mesh.position.set(Xaxis[Math.floor(Math.random()*3)],Yaxis[Math.floor(Math.random()*2)],radius/2-radius*Math.random())
@@ -71,6 +167,8 @@
                 }
 
 
+
+                //creating the floor
                 var meshFloor = new THREE.Mesh(
                 new THREE.PlaneGeometry(1000,1000,1000,1000),
                 new THREE.MeshBasicMaterial({color:0xffffff, wireframe:false})
@@ -81,27 +179,36 @@
                 scene.add(meshFloor);
 
 
-                renderer = new THREE.WebGLRenderer( { antialias: true } );
+                //renderer = new THREE.WebGLRenderer( { antialias: true } );
                 renderer.setPixelRatio( window.devicePixelRatio );
                 renderer.setSize( window.innerWidth, window.innerHeight );
                 document.body.appendChild( renderer.domElement );
 
 
                 collision();
-
+               
                 window.addEventListener( 'resize', onWindowResize );
                window.addEventListener('keydown', movePlayer, false);
             }
-           
+
+           //checking if camera position is inside the box's edges since it is never exact, by stating a range
             function collision(){
                 for(var i =0;i<obstacles.length;i++){
+
                 if(((camera.position.x>obstacles[i].position.x-10)&&(camera.position.x<obstacles[i].position.x+10)) && 
-                    ((camera.position.x>obstacles[i].position.y-10)&&(camera.position.x<obstacles[i].position.y+10)) &&
-                    ((camera.position.x>obstacles[i].position.z-10)&&(camera.position.x<obstacles[i].position.z+10))){
-                    alert('hit');
+                    ((camera.position.y>obstacles[i].position.y-10)&&(camera.position.y<obstacles[i].position.y+10)) &&
+                    ((camera.position.z>obstacles[i].position.z-10)&&(camera.position.z<obstacles[i].position.z+10))){
+
+
+                   alert('game over');
+                   window.cancelAnimationFrame(id);
+                   //return back to the begining
+                   obstacles[i].position.z=-600;
+                   animate();
                 }
             }
-            }
+
+        }
 
 
 
@@ -113,48 +220,53 @@
                 renderer.setSize( window.innerWidth, window.innerHeight );
 
             }
-           
+
+            
+           // id to know which animation frame to cancel
+           var id;
             function animate() {
 
-                requestAnimationFrame( animate );
-                control();
-                ixMovementUpdate();
+                id = requestAnimationFrame( animate );
+                jump();
+                jumpMovement();
 
+                //moving boxes
                 for( var i = 0; i<obstacles.length;i++){
                     if(obstacles[i].position.z>=camera.position.z){
-                        obstacles[i].position.z=-600;
+                        obstacles[i].position.z=-600; //return to the begining
                     }else{
                     obstacles[i].position.z += ObSpeed;
                     }
                    // console.log(camera.position);
                 }
 
-
+                collision();
+                
                 renderer.render( scene, camera );
 
             }
 
           
-            function control(){
+            function jump(){
 
               if(controls[32]) { // space
             
-              if(player.jumps) 
+              if(player.jumps) //if he had already jumped he won't jump again
 
                 return false;
 
               player.jumps = true;
-              player.velocity =- player.jumpHeight;
+              player.velocity = - player.jumpHeight; // - G
             }
           }
 
 
 
-        function ixMovementUpdate() { //jump and hit floor
-        
+        function jumpMovement() { //jumping mechanism
+        //going down
             player.velocity += player.gravity;
             camera.position.y -= player.velocity;
-
+         //to not go under the floor
             if(camera.position.y < player.height) {
 
               camera.position.y = player.height;
@@ -165,19 +277,20 @@
 
         function movePlayer( evt ) {
 
-        var dir = new THREE.Vector3( 100, 0, 0);
-        var crouch = new THREE.Vector3(0 , 50 , 0);
+        var dir = new THREE.Vector3( 100, 0, 0); //direction
        
         switch( evt.key ) {
 
          
           case 'a':
+          //stops when reaching the edge
           if(camera.position.x == -100)
          {
  
-          
+          //do nothing          
          }
          else{
+            //moves left
             camera.position.sub(dir);
            
            }
@@ -186,19 +299,23 @@
           case 'd':
           if(camera.position.x == 100)
          {
- 
+            //do nothing
           
          }
           else{ 
+            //moves right
             camera.position.add(dir);
                
                }
                 break;
 
            case 'c':
+           //crouch
                 if(camera.position.y==25){
-                    player.height=15;
-                }else if(camera.position.y==15){
+                    //if he is standing, he goes down
+                    player.height=0;
+                }else if(camera.position.y==0){
+                    //if he is down, he stands up
                     player.height=25;
                 }
                 break;
@@ -208,6 +325,7 @@
       window.addEventListener('keydown', movePlayer, false);
 
 }
+
 
         </script>
 
