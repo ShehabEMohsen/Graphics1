@@ -5,7 +5,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
         <link type="text/css" rel="stylesheet" href="main.css">
-
+        <div id="info">score:<div id="ay haga">0</div></div>
 
         <style>
             #blocker {
@@ -28,6 +28,14 @@
                 font-size: 14px;
                 cursor: pointer;
             }
+            #info {
+    position: absolute;
+    top: 10px;
+    width: 100%;
+    text-align: center;
+    z-index: 100;
+    display:block;
+}
         </style>
 
     </head>
@@ -53,8 +61,8 @@
            
 
             import { PointerLockControls } from './jsm/controls/PointerLockControls.js';
-
-            var  light,parameters;
+            import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
+            var  light,light2,parameters;
 
             var mesh, meshFloor2, meshFloor;
             var camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
@@ -85,6 +93,10 @@
 
                 playerJumps: false
                };
+        var object = new THREE.Object3D();
+        //var object1 = new THREE.Object3D(); 
+        var score = 0;
+      
 
       document.addEventListener('keydown', ({ keyCode }) => { controls[keyCode] = true });
       document.addEventListener('keyup', ({ keyCode }) => { controls[keyCode] = false });            
@@ -96,13 +108,14 @@
 
 
             function init() {
-
+                    
                 // width/height to measure aspect ratio
+
                 camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
                 camera.position.set(0, player.height, 5);
                 camera.lookAt(new THREE.Vector3(0, player.height, 0));
-                light = new THREE.DirectionalLight('white',0.3);
-                light.position.set(0, 1000, 700);
+                light = new THREE.DirectionalLight('white',0.8);
+                light.position.set(50, 1000, -100);
                 light.castShadow = true;
                 scene.add(light);
                 light.shadow.mapSize.width=500;
@@ -110,7 +123,50 @@
                 light.shadow.camera.near=1;
 
                 light.shadow.camera.far=500;
-                //scene = new THREE.Scene();
+
+                light2 = new THREE.AmbientLight('white',0.7);
+              
+                scene.add(light2);
+                //habd
+
+               
+               const  loader = new GLTFLoader();
+
+                // Load a glTF resource
+                loader.load(
+
+                'textures/gun/scene.gltf',
+                function ( gltf ) {
+
+            object.add(gltf.scene);        
+            scene.add(object);
+
+
+        var model =   gltf.scene;
+        model.position.x=25;
+        model.position.y=25;
+        model.position.z=-100;
+        model.scale.x=0.1;
+        model.scale.y=0.1;
+        model.scale.z=0.1;
+        model.rotation.x=0;
+        model.rotation.z=0;
+        model.rotation.y=-1.5;
+
+            
+        model.castShadow =true;
+        model.receiveShadow=true;
+       //  gltf.animations; // Array<THREE.AnimationClip>
+       // // THREE.Group
+       //  gltf.scenes; // Array<THREE.Group>
+       //  gltf.cameras; // Array<THREE.Camera>
+       //  gltf.asset; // Object
+
+    },
+);
+
+
+
                  const geometry = new THREE.BoxGeometry( 20, 20, 20 );
                
 
@@ -147,10 +203,88 @@
                 } );
 
                 scene.add( mousecontrols.getObject() );
+                //pointer lel object
+               let mousecontrols1 ; 
+
+               mousecontrols1 = new PointerLockControls(object,renderer.domElement);
 
 
-                 
-                const material = new THREE.MeshBasicMaterial( { map: texture } );
+                const blocker1 = document.getElementById( 'blocker' );
+                const instructions1 = document.getElementById( 'instructions' );
+
+                instructions1.addEventListener( 'click', function () {
+
+                    mousecontrols1.lock();
+
+                },false );
+
+                mousecontrols1.addEventListener( 'lock', function () {
+
+                    instructions1.style.display = 'none';
+                    blocker1.style.display = 'none';
+
+                } );
+
+                mousecontrols1.addEventListener( 'unlock', function () {
+
+                    blocker1.style.display = 'block';
+                    instructions1.style.display = '';
+
+                } );
+               scene.add( mousecontrols1.getObject() );
+
+//                 //habd
+
+
+//                  //habd antman pos
+
+//                      for(var i =0;i<5;i++) {//number of men
+//                                //man object
+//                 const  loader1 = new GLTFLoader();
+
+//                 // Load a glTF resource
+//                 loader1.load(
+
+//                 'textures/man/scene.gltf',  function ( gltf ) {
+
+//             object1.add(gltf.scene);        
+//             scene.add(object1);
+
+
+//         var model =   gltf.scene;
+//         // model.position.x=0;
+//         // model.position.y=0;
+//         // model.position.z=0;
+//         model.scale.x=0.8;
+//         model.scale.y=0.8;
+//         model.scale.z=0.8;
+//         model.rotation.x=0;
+//         model.rotation.z=0;
+//         model.rotation.y=0;
+
+            
+//         model.castShadow =true;
+//         model.receiveShadow=true;
+//        //  gltf.animations; // Array<THREE.AnimationClip>
+//        // // THREE.Group
+//        //  gltf.scenes; // Array<THREE.Group>
+//        //  gltf.cameras; // Array<THREE.Camera>
+//        //  gltf.asset; // Object
+
+//     },
+// );
+
+//                 //habd
+//                 scene.add( object1 );
+//                 object1.position.set(Xaxis[Math.floor(Math.random()*3)],-10,radius/2-radius*Math.random())
+
+//                 obstacles.push(object1);
+//                 }
+
+
+
+//                  //habd
+                const material = new THREE.MeshStandardMaterial( { map: texture } );
 
                //number of boxes, creating boxes and putting them in array
 
@@ -160,8 +294,8 @@
 
                 for(var i =0;i<num;i++) {//number of boxes
                 mesh = new THREE.Mesh( geometry, material );
-                mesh.castShadow = true; //default is false
-                mesh.receiveShadow = false; //default
+                // mesh.castShadow = true; //default is false
+                // mesh.receiveShadow = false; //default
                 scene.add( mesh );
                 mesh.position.set(Xaxis[Math.floor(Math.random()*3)],Yaxis[Math.floor(Math.random()*2)],radius/2-radius*Math.random())
 
@@ -187,7 +321,7 @@
                  var floortexture2 = new THREE.TextureLoader().load("textures/greyfloor.jpg");
                  meshFloor2 = new THREE.Mesh(
                 new THREE.PlaneGeometry(220,2000,1000,1000),
-                new THREE.MeshBasicMaterial({color: 'grey'})
+                new THREE.MeshStandardMaterial({color: 'grey'})
                 );
                
                 meshFloor2.rotation.x -= Math.PI / 2; // Rotate the floor 90 degrees
@@ -212,12 +346,12 @@
 //creating enviroment
 function MaterialArray(filename){
 var materialArray = [];
-var texture_ft = new THREE.TextureLoader().load( 'textures/penguins-skybox-pack/penguins (30)/raspberry_ft.jpg');
-var texture_bk = new THREE.TextureLoader().load( 'textures/penguins-skybox-pack/penguins (30)/raspberry_bk.jpg');
-var texture_up = new THREE.TextureLoader().load( 'textures/penguins-skybox-pack/penguins (30)/raspberry_up.jpg');
+var texture_ft = new THREE.TextureLoader().load( 'textures/penguins-skybox-pack/penguins (30)/raspberry_bk.jpg');
+var texture_bk = new THREE.TextureLoader().load( 'textures/penguins-skybox-pack/penguins (30)/raspberry_ft.jpg');
+var texture_up = new THREE.TextureLoader().load( 'textures/penguins-skybox-pack/penguins (30)/raspberry_up1.jpg');
 var texture_dn = new THREE.TextureLoader().load('textures/penguins-skybox-pack/penguins (30)/raspberry_dn.jpg');
-var texture_rt = new THREE.TextureLoader().load( 'textures/penguins-skybox-pack/penguins (30)/raspberry_rt.jpg');
-var texture_lf = new THREE.TextureLoader().load( 'textures/penguins-skybox-pack/penguins (30)/raspberry_lf.jpg');
+var texture_rt = new THREE.TextureLoader().load( 'textures/penguins-skybox-pack/penguins (30)/raspberry_lf.jpg');
+var texture_lf = new THREE.TextureLoader().load( 'textures/penguins-skybox-pack/penguins (30)/raspberry_rt.jpg');
   
 materialArray.push(new THREE.MeshBasicMaterial( { map: texture_ft }));
 materialArray.push(new THREE.MeshBasicMaterial( { map: texture_bk }));
@@ -244,6 +378,7 @@ scene.add( skybox );
 
 
                    alert('game over');
+               score=0;
                    window.cancelAnimationFrame(id);
                    //return back to the begining
                    obstacles[i].position.z=-600;
@@ -273,11 +408,16 @@ scene.add( skybox );
                 id = requestAnimationFrame( animate );
                 jump();
                 jumpMovement();
-
+                score+=0.05;
+                 document.getElementById("ay haga").innerHTML = parseInt(score);
                 //moving boxes
                 for( var i = 0; i<obstacles.length;i++){
                     if(obstacles[i].position.z>=camera.position.z){
-                        obstacles[i].position.z=-600; //return to the begining
+                        obstacles[i].position.z=-600; 
+                        
+                       
+
+                        //return to the begining
                     }else{
                     obstacles[i].position.z += ObSpeed;
                     }
@@ -325,11 +465,13 @@ scene.add( skybox );
         //going down
             player.velocity += player.gravity;
             camera.position.y -= player.velocity;
+          object.position.y-= player.velocity;
          //to not go under the floor
-            if(camera.position.y < player.height) {
+            if(camera.position.y < player.height ) {
 
               camera.position.y = player.height;
-              player.jumps = false;
+                 object.position.y = player.height;
+                            player.jumps = false;
             }
         }
            
@@ -351,7 +493,7 @@ scene.add( skybox );
          else{
             //moves left
             camera.position.sub(dir);
-           
+           object.position.sub(dir);
            }
             break;
 
@@ -364,7 +506,8 @@ scene.add( skybox );
           else{ 
             //moves right
             camera.position.add(dir);
-               
+            object.position.add(dir);
+
                }
                 break;
 
@@ -373,6 +516,7 @@ scene.add( skybox );
                 if(camera.position.y==25){
                     //if he is standing, he goes down
                     player.height=0;
+
                 }else if(camera.position.y==0){
                     //if he is down, he stands up
                     player.height=25;
