@@ -6,7 +6,7 @@
         <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
         <link type="text/css" rel="stylesheet" href="main.css">
         <div id="info">score:<div id="ay haga">0</div></div>
-
+       
         <style>
             #blocker {
                 position: absolute;
@@ -55,16 +55,17 @@
             </div>
         </div>
 
-        <script type="module">
+        <script type="module" onclick="mouseclick(event)">
 
             import * as THREE from '../build/three.module.js';
            
 
             import { PointerLockControls } from './jsm/controls/PointerLockControls.js';
             import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
+         
             var  light,light2,parameters;
 
-            var mesh, meshFloor2, meshFloor;
+            var mesh, meshFloor2, meshFloor, sphere;
             var camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
 
             
@@ -95,8 +96,8 @@
                };
         var object = new THREE.Object3D();
         //var object1 = new THREE.Object3D(); 
-        var score = 0;
-      
+         var score = 0;
+         var bullets = [];
 
       document.addEventListener('keydown', ({ keyCode }) => { controls[keyCode] = true });
       document.addEventListener('keyup', ({ keyCode }) => { controls[keyCode] = false });            
@@ -144,8 +145,8 @@
 
         var model =   gltf.scene;
         model.position.x=25;
-        model.position.y=25;
-        model.position.z=-100;
+        model.position.y=2;
+        model.position.z=-25;
         model.scale.x=0.1;
         model.scale.y=0.1;
         model.scale.z=0.1;
@@ -183,7 +184,7 @@
                 const instructions = document.getElementById( 'instructions' );
 
                 instructions.addEventListener( 'click', function () {
-
+                   
                     mousecontrols.lock();
 
                 },false );
@@ -199,10 +200,11 @@
 
                     blocker.style.display = 'block';
                     instructions.style.display = '';
-
+                //scene.remove(sphere);
                 } );
 
                 scene.add( mousecontrols.getObject() );
+
                 //pointer lel object
                let mousecontrols1 ; 
 
@@ -222,13 +224,14 @@
 
                     instructions1.style.display = 'none';
                     blocker1.style.display = 'none';
-
+ 
                 } );
 
                 mousecontrols1.addEventListener( 'unlock', function () {
 
                     blocker1.style.display = 'block';
                     instructions1.style.display = '';
+              
 
                 } );
                scene.add( mousecontrols1.getObject() );
@@ -284,6 +287,17 @@
 
 
 //                  //habd
+
+
+
+            for(var i =0;i<num;i++) {
+        var sphereGeometry = new THREE.SphereGeometry( 10, 20, 20 );
+        var sphereMaterial = new THREE.MeshLambertMaterial( { color: 0x888855 } );   
+        sphere = new THREE.Mesh( sphereGeometry, sphereMaterial );
+            //bullets.push( sphere );
+            }
+       
+
                 const material = new THREE.MeshStandardMaterial( { map: texture } );
 
                //number of boxes, creating boxes and putting them in array
@@ -341,6 +355,7 @@
                
                 window.addEventListener( 'resize', onWindowResize );
                window.addEventListener('keydown', movePlayer, false);
+
             }
 
 //creating enviroment
@@ -379,6 +394,21 @@ scene.add( skybox );
 
                    alert('game over');
                score=0;
+              // scene.remove(sphere);
+                   window.cancelAnimationFrame(id);
+                   //return back to the begining
+                   obstacles[i].position.z=-600;
+                   animate();
+                }
+                if(((sphere.position.x>obstacles[i].position.x-10)&&(sphere.position.x<obstacles[i].position.x+10)) && 
+                    ((sphere.position.y>obstacles[i].position.y-10)&&(sphere.position.y<obstacles[i].position.y+10)) &&
+                    ((sphere.position.z>obstacles[i].position.z-10)&&(sphere.position.z<obstacles[i].position.z+10))){
+
+
+                 
+               score+=5; 
+          //  sphere.position.set( object.position.x,object.position.y,object.position.z);
+               scene.remove(sphere);
                    window.cancelAnimationFrame(id);
                    //return back to the begining
                    obstacles[i].position.z=-600;
@@ -437,8 +467,28 @@ scene.add( skybox );
                     }
                    // console.log(camera.position);
                 }
+//habd
+for(var index=0; index<bullets.length; index+=95){
+        // if( bullets[index] === undefined ) continue;
+        // if( bullets[index].alive == false ){
+        //     bullets.splice(index,1);
+        //     continue;
+        // }
+        
+        bullets[index].position.add(bullets[index].velocity);
+    }
+sphere.velocity = new THREE.Vector3(
+            -Math.sin(camera.rotation.y),
+                        0,
+            -Math.cos(camera.rotation.y)
+        );
+    // add to scene, array, and set the delay to 10 frames
+        bullets.push(sphere);
+        scene.add(sphere);
+//habd
 
               //to be called everytime a box moves
+
                 collision();
                 
                 renderer.render( scene, camera );
@@ -528,6 +578,19 @@ scene.add( skybox );
       window.addEventListener('keydown', movePlayer, false);
 
 }
+
+   function mouseclick(e){
+
+
+                sphere.castShadow = true;
+                sphere.receiveShadow = true;
+                sphere.position.set( object.position.x,object.position.y,object.position.z);
+                 scene.add( sphere );
+       }
+
+
+    
+window.addEventListener('mouseup', mouseclick);
 
 
         </script>
