@@ -59,7 +59,7 @@
 
             import * as THREE from '../build/three.module.js';
            
-
+            import * as SkeletonUtils from './jsm/utils/SkeletonUtils.js';
             import { PointerLockControls } from './jsm/controls/PointerLockControls.js';
             import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
          
@@ -82,6 +82,7 @@
             var Yaxis=[0,30];
 
             var obstacles=[];
+            var obstacles2=[];
             var ObSpeed=3;
 
             let controls = {};
@@ -95,10 +96,11 @@
                 playerJumps: false
                };
         var object = new THREE.Object3D();
-        //var object1 = new THREE.Object3D(); 
+        var object1 = new THREE.Object3D(); 
          var score = 0;
          var bullets = [];
-
+        const mixers = [];
+       var clock = new THREE.Clock();
       document.addEventListener('keydown', ({ keyCode }) => { controls[keyCode] = true });
       document.addEventListener('keyup', ({ keyCode }) => { controls[keyCode] = false });            
             
@@ -236,53 +238,66 @@
                 } );
                scene.add( mousecontrols1.getObject() );
 
-//                 //habd
+                //habd
 
 
-//                  //habd antman pos
+                 //habd antman pos
 
-//                      for(var i =0;i<5;i++) {//number of men
-//                                //man object
-//                 const  loader1 = new GLTFLoader();
+                     for(var i =0;i<1;i++) {//number of men
+                               //man object
+                const  loader1 = new GLTFLoader();
 
-//                 // Load a glTF resource
-//                 loader1.load(
+                // Load a glTF resource
+                loader1.load(
 
-//                 'textures/man/scene.gltf',  function ( gltf ) {
+                'textures/ghost/scene.gltf',  function ( gltf ) {
 
-//             object1.add(gltf.scene);        
-//             scene.add(object1);
+            // object1.add(gltf.scene);        
+            // scene.add(object1);
+        
+    
+        
+         var model = SkeletonUtils.clone( gltf.scene );
+        // model.position.x=0;
+        // model.position.y=0;
+        // model.position.z=0;
+        model.scale.x=5;
+        model.scale.y=5;
+        model.scale.z=5;
+        model.rotation.x=0;
+        model.rotation.z=0;
+        model.rotation.y=0;
+        const mixer1 = new THREE.AnimationMixer( model );
+        mixer1.clipAction( gltf.animations[ 0 ] ).play(); // fly 
 
+        animate();       
+        // model.castShadow =true;
+        // model.receiveShadow=true;
 
-//         var model =   gltf.scene;
-//         // model.position.x=0;
-//         // model.position.y=0;
-//         // model.position.z=0;
-//         model.scale.x=0.8;
-//         model.scale.y=0.8;
-//         model.scale.z=0.8;
-//         model.rotation.x=0;
-//         model.rotation.z=0;
-//         model.rotation.y=0;
+        obstacles.push(model);
 
-            
-//         model.castShadow =true;
-//         model.receiveShadow=true;
-//        //  gltf.animations; // Array<THREE.AnimationClip>
-//        // // THREE.Group
-//        //  gltf.scenes; // Array<THREE.Group>
-//        //  gltf.cameras; // Array<THREE.Camera>
-//        //  gltf.asset; // Object
+        scene.add(model);
 
-//     },
-// );
+        model.position.set(Xaxis[Math.floor
+        (Math.random()*3)],20,radius/2-radius*Math.random());
 
-//                 //habd
-//                 scene.add( object1 );
-//                 object1.position.set(Xaxis[Math.floor(Math.random()*3)],-10,radius/2-radius*Math.random())
+        mixers.push( mixer1);
 
-//                 obstacles.push(object1);
-//                 }
+       //  gltf.animations; // Array<THREE.AnimationClip>
+       // // THREE.Group
+       //  gltf.scenes; // Array<THREE.Group>
+       //  gltf.cameras; // Array<THREE.Camera>
+       //  gltf.asset; // Object
+
+    },
+);
+
+         
+                
+              //  object1.position.set(Xaxis[Math.floor(Math.random()*3)],-10,radius/2-radius*Math.random())
+
+               // obstacles2.push(object1);
+                }
 
 
 
@@ -311,7 +326,7 @@
                 // mesh.castShadow = true; //default is false
                 // mesh.receiveShadow = false; //default
                 scene.add( mesh );
-                mesh.position.set(Xaxis[Math.floor(Math.random()*3)],Yaxis[Math.floor(Math.random()*2)],radius/2-radius*Math.random())
+                mesh.position.set(Xaxis[Math.floor(Math.random()*3)],0,radius/2-radius*Math.random())
 
                 obstacles.push(mesh);
                 }
@@ -436,6 +451,11 @@ scene.add( skybox );
             function animate() {
 
                 id = requestAnimationFrame( animate );
+
+                const delta = clock.getDelta();
+
+                for ( const mixer of mixers ) mixer.update( delta );
+
                 jump();
                 jumpMovement();
                 score+=0.05;
