@@ -146,8 +146,8 @@
 
 
         var model =   gltf.scene;
-        model.position.x=25;
-        model.position.y=2;
+        model.position.x=30;
+        model.position.y=-17;
         model.position.z=-25;
         model.scale.x=0.1;
         model.scale.y=0.1;
@@ -274,12 +274,12 @@
         // model.castShadow =true;
         // model.receiveShadow=true;
 
-        obstacles.push(model);
+        obstacles2.push(model);
 
         scene.add(model);
 
         model.position.set(Xaxis[Math.floor
-        (Math.random()*3)],20,radius/2-radius*Math.random());
+        (Math.random()*3)],10,radius/2-radius*Math.random());
 
         mixers.push( mixer1);
 
@@ -376,12 +376,12 @@
 //creating enviroment
 function MaterialArray(filename){
 var materialArray = [];
-var texture_ft = new THREE.TextureLoader().load( 'textures/penguins-skybox-pack/penguins (30)/raspberry_bk.jpg');
-var texture_bk = new THREE.TextureLoader().load( 'textures/penguins-skybox-pack/penguins (30)/raspberry_ft.jpg');
-var texture_up = new THREE.TextureLoader().load( 'textures/penguins-skybox-pack/penguins (30)/raspberry_up1.jpg');
-var texture_dn = new THREE.TextureLoader().load('textures/penguins-skybox-pack/penguins (30)/raspberry_dn.jpg');
-var texture_rt = new THREE.TextureLoader().load( 'textures/penguins-skybox-pack/penguins (30)/raspberry_lf.jpg');
-var texture_lf = new THREE.TextureLoader().load( 'textures/penguins-skybox-pack/penguins (30)/raspberry_rt.jpg');
+var texture_ft = new THREE.TextureLoader().load( 'textures/penguins (30)/raspberry_bk.jpg');
+var texture_bk = new THREE.TextureLoader().load( 'textures/penguins (30)/raspberry_ft.jpg');
+var texture_up = new THREE.TextureLoader().load( 'textures/penguins (30)/raspberry_up1.jpg');
+var texture_dn = new THREE.TextureLoader().load('textures/penguins (30)/raspberry_dn.jpg');
+var texture_rt = new THREE.TextureLoader().load( 'textures/penguins (30)/raspberry_lf.jpg');
+var texture_lf = new THREE.TextureLoader().load( 'textures/penguins (30)/raspberry_rt.jpg');
   
 materialArray.push(new THREE.MeshBasicMaterial( { map: texture_ft }));
 materialArray.push(new THREE.MeshBasicMaterial( { map: texture_bk }));
@@ -415,9 +415,25 @@ scene.add( skybox );
                    obstacles[i].position.z=-600;
                    animate();
                 }
-                if(((sphere.position.x>obstacles[i].position.x-10)&&(sphere.position.x<obstacles[i].position.x+10)) && 
-                    ((sphere.position.y>obstacles[i].position.y-10)&&(sphere.position.y<obstacles[i].position.y+10)) &&
-                    ((sphere.position.z>obstacles[i].position.z-10)&&(sphere.position.z<obstacles[i].position.z+10))){
+            }
+            for(var i=0;i<obstacles2.length;i++){
+
+                if(((camera.position.x>obstacles2[i].position.x-10)&&(camera.position.x<obstacles2[i].position.x+10)) && 
+                    ((camera.position.y>obstacles2[i].position.y-20)&&(camera.position.y<obstacles2[i].position.y+20)) &&
+                    ((camera.position.z>obstacles2[i].position.z-10)&&(camera.position.z<obstacles2[i].position.z+10))){
+
+
+                   alert('game over');
+               score=0;
+              // scene.remove(sphere);
+                   window.cancelAnimationFrame(id);
+                   //return back to the begining
+                   obstacles2[i].position.z=-600;
+                   animate();
+                }
+                if(((sphere.position.x>obstacles2[i].position.x-10)&&(sphere.position.x<obstacles2[i].position.x+10)) && 
+                    ((sphere.position.y>obstacles2[i].position.y-20)&&(sphere.position.y<obstacles2[i].position.y+20)) &&
+                    ((sphere.position.z>obstacles2[i].position.z-10)&&(sphere.position.z<obstacles2[i].position.z+10))){
 
 
                  
@@ -426,7 +442,7 @@ scene.add( skybox );
                scene.remove(sphere);
                    window.cancelAnimationFrame(id);
                    //return back to the begining
-                   obstacles[i].position.z=-600;
+                   obstacles2[i].position.z=-600;
                    animate();
                 }
             }
@@ -460,6 +476,24 @@ scene.add( skybox );
                 jumpMovement();
                 score+=0.05;
                  document.getElementById("ay haga").innerHTML = parseInt(score);
+
+                 //moving Ghost
+                  for( var i = 0; i<obstacles2.length;i++){
+                    if(obstacles2[i].position.z>=camera.position.z){
+                        obstacles2[i].position.z=-600; 
+                        
+                       
+
+                        //return to the begining
+                    }else{
+                    obstacles2[i].position.z += ObSpeed;
+                    }
+                }
+
+
+
+
+
                 //moving boxes
                 for( var i = 0; i<obstacles.length;i++){
                     if(obstacles[i].position.z>=camera.position.z){
@@ -499,7 +533,7 @@ for(var index=0; index<bullets.length; index+=95){
     }
 sphere.velocity = new THREE.Vector3(
             -Math.sin(camera.rotation.y),
-                        0,
+                       0,
             -Math.cos(camera.rotation.y)
         );
     // add to scene, array, and set the delay to 10 frames
@@ -605,6 +639,7 @@ sphere.velocity = new THREE.Vector3(
                 sphere.castShadow = true;
                 sphere.receiveShadow = true;
                 sphere.position.set( object.position.x,object.position.y,object.position.z);
+
                  scene.add( sphere );
        }
 
