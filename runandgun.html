@@ -59,13 +59,13 @@
 
             import * as THREE from '../build/three.module.js';
            
-            import * as SkeletonUtils from './jsm/utils/SkeletonUtils.js';
+            
             import { PointerLockControls } from './jsm/controls/PointerLockControls.js';
             import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
          
             var  light,light2,parameters;
 
-            var mesh, meshFloor2, meshFloor, sphere;
+            var mesh, meshFloor2, meshFloor, sphere, rasef, rasef2;
             var camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
 
             
@@ -75,11 +75,13 @@
             renderer.shadowMap.type = THREE.PCFSoftShadowMap; // default THREE.PCFShadowMap
             let scene = new THREE.Scene();
 
-            var radius= 2000;
-            var num=12;
+            
+            var num=50;
+            var Z=-500, Z2=-500;
+
       
-            var Xaxis=[0,-200/2, 200/2];
-            var Yaxis=[0,30];
+            var Xaxis=[0,-100, 100];
+            
 
             var obstacles=[];
             var obstacles2=[];
@@ -118,14 +120,10 @@
                 camera.position.set(0, player.height, 5);
                 camera.lookAt(new THREE.Vector3(0, player.height, 0));
                 light = new THREE.DirectionalLight('white',0.8);
-                light.position.set(50, 1000, -100);
-                light.castShadow = true;
+                light.position.set(-50, 1000, 100);
+                
                 scene.add(light);
-                light.shadow.mapSize.width=500;
-                light.shadow.mapSize.height=500;
-                light.shadow.camera.near=1;
-
-                light.shadow.camera.far=500;
+                
 
                 light2 = new THREE.AmbientLight('white',0.7);
               
@@ -147,7 +145,7 @@
 
         var model =   gltf.scene;
         model.position.x=30;
-        model.position.y=-17;
+        model.position.y=-12;
         model.position.z=-25;
         model.scale.x=0.1;
         model.scale.y=0.1;
@@ -157,13 +155,7 @@
         model.rotation.y=-1.5;
 
             
-        model.castShadow =true;
-        model.receiveShadow=true;
-       //  gltf.animations; // Array<THREE.AnimationClip>
-       // // THREE.Group
-       //  gltf.scenes; // Array<THREE.Group>
-       //  gltf.cameras; // Array<THREE.Camera>
-       //  gltf.asset; // Object
+        
 
     },
 );
@@ -175,7 +167,24 @@
 
                 //in the htdocs files
                 const texture = new THREE.TextureLoader().load( 'textures/crate.gif' );
-              
+
+                //habd ghourab
+
+                const geometry2 = new THREE.BoxGeometry( 20, 20, 5000 );
+               
+
+                //in the htdocs files
+                const texture2 = new THREE.TextureLoader().load( 'textures/rasef.jpg',(texture2 =>{
+                	// bt3mel repeat l el texture
+                	texture2.wrapS = texture2.wrapT = THREE.RepeatWrapping; // horizontally in wrapS and vertically in wrapT
+            		texture2.repeat.y = 60;
+            		texture2.repeat.x = 10;
+                }) );
+
+
+              //habd done
+
+              //3a4an bast3mel el function hen bas el var global aktar
 
               let mousecontrols ; 
 
@@ -185,11 +194,15 @@
                 const blocker = document.getElementById( 'blocker' );
                 const instructions = document.getElementById( 'instructions' );
 
+                //on click by7gez el mouse l el game
+
                 instructions.addEventListener( 'click', function () {
                    
                     mousecontrols.lock();
 
-                },false );
+                });
+
+                // law el mouse locked 4el el instructions w el blocker
 
                 mousecontrols.addEventListener( 'lock', function () {
 
@@ -197,6 +210,8 @@
                     blocker.style.display = 'none';
 
                 } );
+
+                //law el mouse unlocked display el instructions w el blocker
 
                 mousecontrols.addEventListener( 'unlock', function () {
 
@@ -212,38 +227,12 @@
 
                mousecontrols1 = new PointerLockControls(object,renderer.domElement);
 
+            
+               scene.add( mousecontrols1.getObject());
 
-                const blocker1 = document.getElementById( 'blocker' );
-                const instructions1 = document.getElementById( 'instructions' );
+                
 
-                instructions1.addEventListener( 'click', function () {
-
-                    mousecontrols1.lock();
-
-                },false );
-
-                mousecontrols1.addEventListener( 'lock', function () {
-
-                    instructions1.style.display = 'none';
-                    blocker1.style.display = 'none';
- 
-                } );
-
-                mousecontrols1.addEventListener( 'unlock', function () {
-
-                    blocker1.style.display = 'block';
-                    instructions1.style.display = '';
-              
-
-                } );
-               scene.add( mousecontrols1.getObject() );
-
-                //habd
-
-
-                 //habd antman pos
-
-                     for(var i =0;i<1;i++) {//number of men
+                     for(var i =0;i<5;i++) {//number of Ghosts
                                //man object
                 const  loader1 = new GLTFLoader();
 
@@ -252,15 +241,12 @@
 
                 'textures/ghost/scene.gltf',  function ( gltf ) {
 
-            // object1.add(gltf.scene);        
-            // scene.add(object1);
+          
         
     
         
-         var model = SkeletonUtils.clone( gltf.scene );
-        // model.position.x=0;
-        // model.position.y=0;
-        // model.position.z=0;
+         var model = gltf.scene;
+       
         model.scale.x=5;
         model.scale.y=5;
         model.scale.z=5;
@@ -270,50 +256,43 @@
         const mixer1 = new THREE.AnimationMixer( model );
         mixer1.clipAction( gltf.animations[ 0 ] ).play(); // fly 
 
-        animate();       
-        // model.castShadow =true;
-        // model.receiveShadow=true;
-
+              
+        
         obstacles2.push(model);
 
         scene.add(model);
 
         model.position.set(Xaxis[Math.floor
-        (Math.random()*3)],10,radius/2-radius*Math.random());
+        (Math.random()*3)],5,Z2);
+        Z2-=1000; // el masafa maben kol ghost 1000 fel z
 
         mixers.push( mixer1);
-
-       //  gltf.animations; // Array<THREE.AnimationClip>
-       // // THREE.Group
-       //  gltf.scenes; // Array<THREE.Group>
-       //  gltf.cameras; // Array<THREE.Camera>
-       //  gltf.asset; // Object
 
     },
 );
 
          
                 
-              //  object1.position.set(Xaxis[Math.floor(Math.random()*3)],-10,radius/2-radius*Math.random())
-
-               // obstacles2.push(object1);
+             
                 }
 
 
 
-//                  //habd
 
 
 
-            for(var i =0;i<num;i++) {
+
+           // el bullet
         var sphereGeometry = new THREE.SphereGeometry( 10, 20, 20 );
         var sphereMaterial = new THREE.MeshLambertMaterial( { color: 0x888855 } );   
         sphere = new THREE.Mesh( sphereGeometry, sphereMaterial );
-            //bullets.push( sphere );
-            }
+        
+            
        
-
+        		// da ya hady el box
                 const material = new THREE.MeshStandardMaterial( { map: texture } );
+                // da ya 3elewa el rasef
+                const material2 = new THREE.MeshStandardMaterial( { map: texture2 } );
 
                //number of boxes, creating boxes and putting them in array
 
@@ -321,43 +300,52 @@
                //Yaxis takes from random from an array
                //Z is completely random, from negative radius /2 to radius/2
 
+               //el rasef
+                rasef = new THREE.Mesh( geometry2, material2 );
+               
+                scene.add( rasef );
+                rasef.position.set(-120,-10,0);
+
+                rasef2 = new THREE.Mesh( geometry2, material2 );
+               
+                scene.add( rasef2 );
+                rasef2.position.set(120,-10,0);
+               
+
+               
+
                 for(var i =0;i<num;i++) {//number of boxes
                 mesh = new THREE.Mesh( geometry, material );
-                // mesh.castShadow = true; //default is false
-                // mesh.receiveShadow = false; //default
-                scene.add( mesh );
-                mesh.position.set(Xaxis[Math.floor(Math.random()*3)],0,radius/2-radius*Math.random())
+               
+               scene.add( mesh );
+                mesh.position.set(Xaxis[Math.floor(Math.random()*3)],-5,Z)
+                Z-=100; // el far2 mabyn kol box we el tany 100 
+                 
 
                 obstacles.push(mesh);
                 }
 
 
 
-                //creating the floor
-                 var floortexture = new THREE.TextureLoader().load("textures/grass.jpg");
-                meshFloor = new THREE.Mesh(
-                new THREE.PlaneGeometry(1000,2000,1000,1000),
-                new THREE.MeshBasicMaterial({map: floortexture})
-                );
                
-                meshFloor.rotation.x -= Math.PI / 2; // Rotate the floor 90 degrees
-
-                meshFloor.position.y -= 16; 
-                scene.add(meshFloor);
 
 
                 //creating the floor2
-                 var floortexture2 = new THREE.TextureLoader().load("textures/greyfloor.jpg");
+                 var floortexture2 = new THREE.TextureLoader().load("textures/asphalt.jpg", (floortexture2)=> {
+                 	floortexture2.wrapS = texture.wrapT = THREE.RepeatWrapping;
+            		floortexture2.repeat.y = 60;
+            		floortexture2.repeat.x = 10;
+
+                 });
                  meshFloor2 = new THREE.Mesh(
-                new THREE.PlaneGeometry(220,2000,1000,1000),
-                new THREE.MeshStandardMaterial({color: 'grey'})
+                new THREE.PlaneGeometry(220,5000,1000,1000),
+                new THREE.MeshLambertMaterial({map: floortexture2})
                 );
                
-                meshFloor2.rotation.x -= Math.PI / 2; // Rotate the floor 90 degrees
+                meshFloor2.rotation.x =- Math.PI / 2; // Rotate the floor 90 degrees
 
-                meshFloor2.position.y -= 15; 
-                meshFloor2.castShadow= false;
-                meshFloor2.receiveShadow=true;
+                meshFloor2.position.y =- 15; 
+                
                 scene.add(meshFloor2);
 
                 //renderer = new THREE.WebGLRenderer( { antialias: true } );
@@ -365,16 +353,16 @@
                 renderer.setSize( window.innerWidth, window.innerHeight );
                 document.body.appendChild( renderer.domElement );
 
-               MaterialArray('penguins (30)');
-                collision();
+               MaterialArray();
+                
                
                 window.addEventListener( 'resize', onWindowResize );
-               window.addEventListener('keydown', movePlayer, false);
+               window.addEventListener('keydown', movePlayer);
 
             }
 
 //creating enviroment
-function MaterialArray(filename){
+function MaterialArray(){
 var materialArray = [];
 var texture_ft = new THREE.TextureLoader().load( 'textures/penguins (30)/raspberry_bk.jpg');
 var texture_bk = new THREE.TextureLoader().load( 'textures/penguins (30)/raspberry_ft.jpg');
@@ -403,7 +391,7 @@ scene.add( skybox );
                 for(var i =0;i<obstacles.length;i++){
 
                 if(((camera.position.x>obstacles[i].position.x-10)&&(camera.position.x<obstacles[i].position.x+10)) && 
-                    ((camera.position.y>obstacles[i].position.y-10)&&(camera.position.y<obstacles[i].position.y+10)) &&
+                    ((camera.position.y>obstacles[i].position.y-10)&&(camera.position.y<obstacles[i].position.y+31)) &&
                     ((camera.position.z>obstacles[i].position.z-10)&&(camera.position.z<obstacles[i].position.z+10))){
 
 
@@ -412,14 +400,14 @@ scene.add( skybox );
               // scene.remove(sphere);
                    window.cancelAnimationFrame(id);
                    //return back to the begining
-                   obstacles[i].position.z=-600;
+                   obstacles[i].position.z=-5000;
                    animate();
                 }
             }
             for(var i=0;i<obstacles2.length;i++){
 
                 if(((camera.position.x>obstacles2[i].position.x-10)&&(camera.position.x<obstacles2[i].position.x+10)) && 
-                    ((camera.position.y>obstacles2[i].position.y-20)&&(camera.position.y<obstacles2[i].position.y+20)) &&
+                    ((camera.position.y>obstacles2[i].position.y)) &&
                     ((camera.position.z>obstacles2[i].position.z-10)&&(camera.position.z<obstacles2[i].position.z+10))){
 
 
@@ -428,21 +416,21 @@ scene.add( skybox );
               // scene.remove(sphere);
                    window.cancelAnimationFrame(id);
                    //return back to the begining
-                   obstacles2[i].position.z=-600;
+                   obstacles2[i].position.z=-5000;
                    animate();
                 }
-                if(((sphere.position.x>obstacles2[i].position.x-10)&&(sphere.position.x<obstacles2[i].position.x+10)) && 
-                    ((sphere.position.y>obstacles2[i].position.y-20)&&(sphere.position.y<obstacles2[i].position.y+20)) &&
-                    ((sphere.position.z>obstacles2[i].position.z-10)&&(sphere.position.z<obstacles2[i].position.z+10))){
+                if(((sphere.position.x+5>obstacles2[i].position.x-10)&&(sphere.position.x-5<obstacles2[i].position.x+10)) && 
+                    ((sphere.position.y+5>obstacles2[i].position.y-20)&&(sphere.position.y-5<obstacles2[i].position.y+20)) &&
+                    ((sphere.position.z+5>obstacles2[i].position.z-10)&&(sphere.position.z-5<obstacles2[i].position.z+10))){
 
 
                  
-               score+=5; 
+               score+=100; 
           //  sphere.position.set( object.position.x,object.position.y,object.position.z);
                scene.remove(sphere);
                    window.cancelAnimationFrame(id);
                    //return back to the begining
-                   obstacles2[i].position.z=-600;
+                   obstacles2[i].position.z=-5000;
                    animate();
                 }
             }
@@ -455,7 +443,7 @@ scene.add( skybox );
             function onWindowResize() {
 
                 camera.aspect = window.innerWidth / window.innerHeight;
-                camera.updateProjectionMatrix();
+                camera.updateProjectionMatrix(); //update el camera be el ratio el gded
 
                 renderer.setSize( window.innerWidth, window.innerHeight );
 
@@ -468,9 +456,9 @@ scene.add( skybox );
 
                 id = requestAnimationFrame( animate );
 
-                const delta = clock.getDelta();
+                const delta = clock.getDelta(); //bt7sb el far2 maben el run time l7ad el current time (el time bta3 el animation)
 
-                for ( const mixer of mixers ) mixer.update( delta );
+                for ( const mixer of mixers ) mixer.update( delta ); // el for loop 4a8ala mara wa7da 3a4an mixer wa7ed 
 
                 jump();
                 jumpMovement();
@@ -480,11 +468,12 @@ scene.add( skybox );
                  //moving Ghost
                   for( var i = 0; i<obstacles2.length;i++){
                     if(obstacles2[i].position.z>=camera.position.z){
-                        obstacles2[i].position.z=-600; 
+                    	//return to the begining
+                        obstacles2[i].position.z=-5000; 
                         
                        
 
-                        //return to the begining
+                        
                     }else{
                     obstacles2[i].position.z += ObSpeed;
                     }
@@ -497,7 +486,7 @@ scene.add( skybox );
                 //moving boxes
                 for( var i = 0; i<obstacles.length;i++){
                     if(obstacles[i].position.z>=camera.position.z){
-                        obstacles[i].position.z=-600; 
+                        obstacles[i].position.z=-5000; 
                         
                        
 
@@ -505,29 +494,19 @@ scene.add( skybox );
                     }else{
                     obstacles[i].position.z += ObSpeed;
                     }
-                    if (meshFloor.position.z>=100
-                        ) {
-                        meshFloor.position.z=-600;
-                    }
-                    else{
-                        meshFloor.position.z+=0.2;
-                    }
+                   
                     if (meshFloor2.position.z>=100
                         ) {
                         meshFloor2.position.z=-600;
                     }
                     else{
-                        meshFloor2.position.z+=0.2;
+                        meshFloor2.position.z+=0.05;
                     }
-                   // console.log(camera.position);
+                  
                 }
-//habd
+// infinite length
 for(var index=0; index<bullets.length; index+=95){
-        // if( bullets[index] === undefined ) continue;
-        // if( bullets[index].alive == false ){
-        //     bullets.splice(index,1);
-        //     continue;
-        // }
+        
         
         bullets[index].position.add(bullets[index].velocity);
     }
@@ -555,9 +534,9 @@ sphere.velocity = new THREE.Vector3(
               if(controls[32]) { // space
             
               if(player.jumps) //if he had already jumped he won't jump again
-
+               {
                 return false;
-
+            	}
               player.jumps = true;
               player.velocity = - player.jumpHeight; // - G
             }
@@ -629,15 +608,14 @@ sphere.velocity = new THREE.Vector3(
 
         }
              
-      window.addEventListener('keydown', movePlayer, false);
+      window.addEventListener('keydown', movePlayer);
 
 }
 
    function mouseclick(e){
 
 
-                sphere.castShadow = true;
-                sphere.receiveShadow = true;
+                
                 sphere.position.set( object.position.x,object.position.y,object.position.z);
 
                  scene.add( sphere );
