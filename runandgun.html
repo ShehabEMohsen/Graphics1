@@ -95,7 +95,7 @@
                 gravity: .2,
                 velocity: 0,
 
-                playerJumps: false
+               jumps: false
                };
         var object = new THREE.Object3D();
         var object1 = new THREE.Object3D(); 
@@ -232,7 +232,7 @@
 
                 
 
-                     for(var i =0;i<5;i++) {//number of Ghosts
+                     for(var i =0;i<10;i++) {//number of Ghosts
                                //man object
                 const  loader1 = new GLTFLoader();
 
@@ -416,7 +416,7 @@ scene.add( skybox );
               // scene.remove(sphere);
                    window.cancelAnimationFrame(id);
                    //return back to the begining
-                   obstacles2[i].position.z=-5000;
+                   obstacles2[i].position.z=-10000;
                    animate();
                 }
                 if(((sphere.position.x+5>obstacles2[i].position.x-10)&&(sphere.position.x-5<obstacles2[i].position.x+10)) && 
@@ -430,7 +430,7 @@ scene.add( skybox );
                scene.remove(sphere);
                    window.cancelAnimationFrame(id);
                    //return back to the begining
-                   obstacles2[i].position.z=-5000;
+                   obstacles2[i].position.z=-10000;
                    animate();
                 }
             }
@@ -469,7 +469,7 @@ scene.add( skybox );
                   for( var i = 0; i<obstacles2.length;i++){
                     if(obstacles2[i].position.z>=camera.position.z){
                     	//return to the begining
-                        obstacles2[i].position.z=-5000; 
+                        obstacles2[i].position.z=-10000; 
                         
                        
 
@@ -538,17 +538,17 @@ sphere.velocity = new THREE.Vector3(
                 return false;
             	}
               player.jumps = true;
-              player.velocity = - player.jumpHeight; // - G
+              player.velocity = - player.jumpHeight; // - G  (-4)
             }
           }
 
 
 
         function jumpMovement() { //jumping mechanism
-        //going down
-            player.velocity += player.gravity;
-            camera.position.y -= player.velocity;
-          object.position.y-= player.velocity;
+        //going up and down (according to the velocity -ve or +ve)
+            player.velocity += player.gravity; //-3.8
+            camera.position.y -= player.velocity; //28.8
+          object.position.y-= player.velocity; //28.8
          //to not go under the floor
             if(camera.position.y < player.height ) {
 
