@@ -75,14 +75,13 @@
             renderer.shadowMap.type = THREE.PCFSoftShadowMap; // default THREE.PCFShadowMap
             let scene = new THREE.Scene();
 
-            
             var num=50;
-            var Z=-500, Z2=-500;
 
-      
+
+            var Z=-500, Z2=-500;
             var Xaxis=[0,-100, 100];
             
-
+// we made the array of obstcales to use the boxes and the ghosts outside the function to use it in function collision
             var obstacles=[];
             var obstacles2=[];
             var ObSpeed=3;
@@ -465,7 +464,7 @@ scene.add( skybox );
                 score+=0.05;
                  document.getElementById("ay haga").innerHTML = parseInt(score);
 
-                 //moving Ghost
+                 //moving Ghost after the camera has passed it
                   for( var i = 0; i<obstacles2.length;i++){
                     if(obstacles2[i].position.z>=camera.position.z){
                     	//return to the begining
@@ -483,7 +482,7 @@ scene.add( skybox );
 
 
 
-                //moving boxes
+                //moving boxes to -5000 in the z axis when the camera pass it 
                 for( var i = 0; i<obstacles.length;i++){
                     if(obstacles[i].position.z>=camera.position.z){
                         obstacles[i].position.z=-5000; 
@@ -558,7 +557,7 @@ sphere.velocity = new THREE.Vector3(
             }
         }
            
-
+//keyboard  to move the position of the camera on the x -axis
         function movePlayer( evt ) {
 
         var dir = new THREE.Vector3( 100, 0, 0); //direction
